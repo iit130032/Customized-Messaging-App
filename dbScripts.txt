@@ -1,0 +1,66 @@
+CREATE TABLE `templedb`.`users` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(16) NOT NULL,
+  `email` VARCHAR(255) NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `create_time` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `templedb`.`users` 
+CHANGE COLUMN `password` `passwordhash` VARCHAR(255) NOT NULL ;
+
+ALTER TABLE `templedb`.`users` 
+ADD COLUMN `fullname` VARCHAR(255) NULL AFTER `username`,
+ADD COLUMN `organization` VARCHAR(255) NULL AFTER `passwordhash`,
+ADD COLUMN `mobile` VARCHAR(15) NULL AFTER `organization`,
+ADD COLUMN `telephone` VARCHAR(15) NULL AFTER `mobile`;
+
+
+CREATE TABLE `templedb`.`members` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `referenceId` INT NULL,
+  `title` VARCHAR(45) NULL,
+  `contactName` VARCHAR(250) NULL,
+  `fullName` VARCHAR(250) NULL,
+  `mobile` VARCHAR(45) NULL,
+  `address` VARCHAR(250) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `referenceId_idx` (`referenceId` ASC) VISIBLE,
+  CONSTRAINT `referenceId`
+    FOREIGN KEY (`referenceId`)
+    REFERENCES `templedb`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ALTER TABLE `templedb`.`members` 
+CHANGE COLUMN `address` `contactAddress` VARCHAR(250) NULL DEFAULT NULL ;
+
+ALTER TABLE `templedb`.`members` 
+ADD COLUMN `email` VARCHAR(45) NULL AFTER `contactAddress`,
+ADD COLUMN `scheduleSMS` TINYINT NULL DEFAULT 0 AFTER `email`;
+
+
+CREATE TABLE `templedb`.`events` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `memberId` INT NOT NULL,
+  `eventName` VARCHAR(45) NULL,
+  `eventDate` DATE NULL,
+  `isOneTime` TINYINT NULL DEFAULT 1,
+  PRIMARY KEY (`id`, `memberId`),
+  INDEX `fk_member_event_idx` (`memberId` ASC) VISIBLE,
+  CONSTRAINT `fk_member_event`
+    FOREIGN KEY (`memberId`)
+    REFERENCES `templedb`.`members` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+ALTER TABLE `templedb`.`events` 
+RENAME TO  `templedb`.`memberevents` ;
+
+ALTER TABLE `templedb`.`memberevents` 
+ADD COLUMN `idx` INT(11) NOT NULL AFTER `memberId`;
+
+ALTER TABLE `templedb`.`users` 
+ADD COLUMN `userRoleId` INT NULL AFTER `telephone`;
+
