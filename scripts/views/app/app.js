@@ -1,0 +1,1 @@
+var templeApp = angular.module('templeApp',[]);
